@@ -1,0 +1,133 @@
+/* === Existing styles from your <style> tag go here first === */
+/* (All the @keyframes, .animate-float, .glass-effect, etc.) */
+
+
+/* === NEW STYLES BELOW === */
+
+/* --- Enhanced ALTURA Logo --- */
+.navbar-altura-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem; /* Tailwind gap-3 */
+}
+
+.altura-logo-img {
+  width: 2.5rem; /* Tailwind w-10 */
+  height: 2.5rem; /* Tailwind h-10 */
+  border-radius: 50%; /* Tailwind rounded-full */
+  /* Add a subtle glow */
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.5); /* Tailwind blue-500/50 */
+  /* Apply rotation animation */
+  animation: spin 8s linear infinite;
+  /* Ensure it's above other elements slightly */
+  z-index: 10;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* --- Home Section Enhancements --- */
+
+/* Glow effect for the main ALTURA title */
+.homepage-altura-title {
+  /* Use text-shadow for glow. Adjust colors/intensity as needed */
+  text-shadow:
+    0 0 5px rgba(255, 255, 255, 0.5),
+    0 0 10px rgba(96, 165, 250, 0.5), /* blue-400 */
+    0 0 15px rgba(96, 165, 250, 0.3);
+  /* Keep existing float animation */
+  animation: float 3s ease-in-out infinite;
+}
+
+/* --- Floating Medical Background Symbols --- */
+.medical-bg {
+  background:
+    radial-gradient(circle at 10% 20%, rgba(30, 58, 138, 0.1) 0%, transparent 20%), /* blue-900/10 */
+    radial-gradient(circle at 90% 80%, rgba(6, 78, 59, 0.1) 0%, transparent 20%),  /* green-900/10 */
+    radial-gradient(circle at 50% 50%, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%); /* slate-900/slate-950 */
+  background-size: 100% 100%, 100% 100%, 100% 100%;
+  position: relative;
+  overflow: hidden;
+  min-height: 100vh; /* Ensure it covers the viewport */
+}
+
+/* Style for the floating symbol container */
+.floating-symbol {
+  position: absolute;
+  opacity: 0.05; /* Very subtle */
+  z-index: 0; /* Behind content */
+  animation: float-symbol 20s infinite ease-in-out;
+  color: white; /* Or any color you prefer */
+  pointer-events: none; /* Symbols shouldn't interfere with clicks */
+}
+
+/* Different sizes and delays for variety */
+.symbol-sm { font-size: 1.5rem; }
+.symbol-md { font-size: 2rem; }
+.symbol-lg { font-size: 2.5rem; }
+
+.symbol-1 { top: 10%; left: 5%; animation-delay: 0s; }
+.symbol-2 { top: 20%; right: 10%; animation-delay: -4s; }
+.symbol-3 { bottom: 15%; left: 15%; animation-delay: -8s; }
+.symbol-4 { bottom: 30%; right: 20%; animation-delay: -12s; }
+.symbol-5 { top: 40%; left: 25%; animation-delay: -16s; }
+.symbol-6 { bottom: 20%; right: 5%; animation-delay: -2s; }
+.symbol-7 { top: 15%; right: 25%; animation-delay: -6s; }
+.symbol-8 { bottom: 10%; left: 30%; animation-delay: -10s; }
+.symbol-9 { top: 60%; left: 10%; animation-delay: -14s; }
+.symbol-10 { top: 70%; right: 15%; animation-delay: -18s; }
+
+/* Slightly different float animation for symbols */
+@keyframes float-symbol {
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+  }
+  25% {
+    transform: translate(15px, -10px) rotate(3deg) scale(1.05);
+  }
+  50% {
+    transform: translate(-10px, 15px) rotate(-3deg) scale(0.95);
+  }
+  75% {
+    transform: translate(10px, 10px) rotate(2deg) scale(1.02);
+  }
+}
+
+
+/* --- Sidebar Toggle Button (Mobile) --- */
+/* You already have styles for the button, just ensure it's visible/works */
+.sidebar-toggle-btn {
+  /* Add z-index to ensure it's clickable over other elements if needed */
+  z-index: 50;
+}
+
+/* --- Connection Status Enhancements --- */
+/* You can add more specific styles if desired, but existing ones are good */
+
+
+/* --- Mode Toggle Button Enhancements --- */
+/* You can add more specific styles if desired, but existing ones are good */
+
+
+/* --- Chat Message Enhancements --- */
+/* You can add more specific styles if desired, but existing ones are good */
+
+
+/* --- Input Area Enhancements --- */
+/* You can add more specific styles if desired, but existing ones are good */
+
+
+/* --- Scrollbar Enhancements --- */
+/* You already have styles, consider slight adjustments if needed */
+/* Example: Make scrollbar slightly thinner on wider screens */
+@media (min-width: 768px) { /* md breakpoint */
+  ::-webkit-scrollbar {
+    width: 6px; /* Slightly thinner */
+  }
+}

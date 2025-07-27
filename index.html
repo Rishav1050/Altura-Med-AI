@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ALTURA - Medical AI Companion</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* General Styles */
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #000; /* Pure black background */
+      color: white;
+    }
+
+    /* Home Section Specific Styles */
+    .home-bg {
+      background-color: #000;
+    }
+
+    /* Navbar */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(15, 23, 42, 0.9);
+      backdrop-filter: blur(10px);
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+    /* ALTURA Logo */
+    .altura-logo-container {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .altura-logo-img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+      animation: spin 5s linear infinite;
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    /* Chat Messages */
+    .message-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem;
+    }
+    .message {
+      margin-bottom: 1rem;
+      word-break: break-word;
+    }
+    .message-user {
+      align-self: flex-end;
+      background: linear-gradient(135deg, #334155 0%, #475569 100%);
+      border-radius: 10px 10px 0 10px;
+    }
+    .message-bot {
+      align-self: flex-start;
+      background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+      border-radius: 10px 10px 10px 0;
+    }
+    .message-text {
+      padding: 1rem;
+      border-radius: 10px;
+      max-width: 70%;
+    }
+    /* Sidebar */
+    .sidebar-bg {
+       background: rgba(15, 23, 42, 0.95); /* Slightly more opaque */
+    }
+    /* Connection Status */
+    .connection-status {
+      margin-top: 1rem;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1rem;
+    }
+    .connected {
+      color: green;
+    }
+    .disconnected {
+      color: red;
+    }
+    /* Mode Toggle */
+    .mode-toggle {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .mode-button {
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      transition: all 0.3s ease;
+    }
+    .mode-button:hover {
+      transform: scale(1.05); /* Slightly less aggressive hover */
+    }
+    .doctor-mode {
+      background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    }
+    .friend-mode {
+      background: linear-gradient(135deg, #334155 0%, #475569 100%);
+    }
+    /* Input Area */
+    .input-area {
+      position: sticky;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.9);
+      backdrop-filter: blur(10px);
+      padding: 1rem;
+      display: flex;
+      gap: 1rem;
+    }
+    .input-field {
+      flex: 1;
+      background: rgba(30, 41, 59, 0.8);
+      border: none;
+      border-radius: 10px;
+      padding: 1rem;
+      color: white;
+      font-size: 1rem;
+    }
+    .send-button {
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+      color: white;
+      transition: all 0.3s ease;
+    }
+    .send-button:hover {
+      transform: scale(1.05); /* Slightly less aggressive hover */
+    }
+    /* Typing Indicator */
+    .typing-indicator {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: #64748b;
+      animation: typing 1.4s infinite ease-in-out;
+    }
+    .typing-indicator:nth-child(1) { animation-delay: -0.32s; }
+    .typing-indicator:nth-child(2) { animation-delay: -0.16s; }
+    @keyframes typing {
+      0%, 80%, 100% { transform: scale(0); opacity: 0.5; }
+      40% { transform: scale(1); opacity: 1; }
+    }
+    /* Animations from previous files */
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0px); }
+    }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7); }
+      50% { box-shadow: 0 0 20px 5px rgba(255, 255, 255, 0.4); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-float {
+      animation: float 3s ease-in-out infinite;
+    }
+    .animate-pulse {
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    .fade-in {
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    /* Sidebar transition */
+    .sidebar-transition {
+      transition: all 0.3s ease;
+    }
+
+    /* Specific styles for the minimalist homepage like in the video */
+    .homepage-altura-title {
+        font-size: 7rem; /* Large text */
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.1rem;
+        /* Keep existing float animation */
+        animation: float 3s ease-in-out infinite;
+    }
+
+    .homepage-subtitle {
+        color: #9ca3af; /* Light gray subtitle */
+        font-size: 1.2rem;
+        margin-top: 1rem; /* Space above */
+    }
+
+    .homepage-start-button {
+        margin-top: 2rem; /* Space above button */
+        padding: 1rem 2rem; /* Button padding */
+        border-radius: 30px; /* Rounded button */
+        background: linear-gradient(to right, #e6e6e6, #f6f9fc); /* Light gradient */
+        color: black;
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+        transition: all 0.3s ease; /* Smooth transition */
+        font-weight: medium;
+    }
+
+    .homepage-start-button:hover {
+        transform: translateY(-3px); /* Lift on hover */
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); /* Stronger shadow on hover */
+    }
+
+    .homepage-disclaimer {
+        color: #9ca3af; /* Light gray disclaimer */
+        font-size: 0.875rem; /* Small text */
+        margin-top: 1rem; /* Space above */
+        max-width: 28rem; /* Reasonable width */
+        text-align: center; /* Center text */
+    }
+
+  </style>
+</head>
+<body class="bg-black">
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+    function App() {
+      const [currentView, setCurrentView] = useState('homepage'); // Start on homepage
+      const [mode, setMode] = useState('Doctor');
+      return (
+        <>
+          {currentView === 'homepage' ? (
+            <Homepage onStart={() => setCurrentView('chat')} />
+          ) : (
+            <ChatInterface
+              mode={mode}
+              setMode={setMode}
+              onHomeClick={() => setCurrentView('homepage')}
+            />
+          )}
+        </>
+      );
+    }
+
+    // --- Updated Homepage Component to match the video ---
+    function Homepage({ onStart }) {
+      return (
+        <div className="h-screen home-bg flex flex-col items-center justify-center">
+          <h1 className="homepage-altura-title text-white">ALTURA</h1>
+          <p className="homepage-subtitle">An intelligent medical companion</p>
+          <button
+            onClick={onStart}
+            className="homepage-start-button"
+          >
+            Start Symptom Check
+          </button>
+          <p className="homepage-disclaimer">
+            Get AI-powered health insights. Not a replacement for professional medical advice.
+          </p>
+        </div>
+      );
+    }
+    // --- End Updated Homepage ---
+
+    function ChatInterface({ mode, setMode, onHomeClick }) {
+      const [messages, setMessages] = useState([
+        {
+          id: 1,
+          text: `Hello! I'm ALTURA, your ${mode === 'Doctor' ? 'medical awareness companion' : 'friendly health buddy'}! 🌟\nWhat can I help you with today?`,
+          isUser: false,
+          timestamp: new Date().toLocaleTimeString()
+        }
+      ]);
+      const [inputText, setInputText] = useState('');
+      const [isLoading, setIsLoading] = useState(false);
+      const [connectionStatus, setConnectionStatus] = useState('unknown');
+      const [showSidebar, setShowSidebar] = useState(false); // Sidebar is initially closed
+      const messagesEndRef = useRef(null);
+      // Auto scroll to bottom
+      useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, [messages]);
+      // Test backend connection on mount
+      useEffect(() => {
+        testBackendConnection();
+      }, []);
+      const testBackendConnection = async () => {
+        try {
+          console.log('🔍 Testing backend connection...');
+          const response = await fetch('http://127.0.0.1:5000/api/health');
+          if (response.ok) {
+            const data = await response.json();
+            console.log('✅ Backend connected:', data);
+            setConnectionStatus('connected');
+          } else {
+            console.log('⚠️ Backend responded with error:', response.status);
+            setConnectionStatus('error');
+          }
+        } catch (error) {
+          console.log('❌ Backend connection failed:', error.message);
+          setConnectionStatus('disconnected');
+        }
+      };
+      // Add a bot message
+      const addBotMessage = (text, isError = false) => {
+        const newMessage = {
+          id: Date.now(),
+          text: text,
+          isUser: false,
+          timestamp: new Date().toLocaleTimeString(),
+          isError: isError
+        };
+        setMessages(prev => [...prev, newMessage]);
+      };
+      // Add typing indicator
+      const addTypingIndicator = () => {
+        const typingMessage = {
+          id: 'typing',
+          text: '',
+          isUser: false,
+          timestamp: new Date().toLocaleTimeString(),
+          isTyping: true
+        };
+        setMessages(prev => [...prev, typingMessage]);
+      };
+      // Remove typing indicator
+      const removeTypingIndicator = () => {
+        setMessages(prev => prev.filter(msg => msg.id !== 'typing'));
+      };
+      // Main handleSend function
+      const handleSend = async () => {
+        if (!inputText.trim() || isLoading) return;
+        console.log(`🩺 Sending: "${inputText}" in ${mode} mode`);
+
+        // Add user message
+        const userMessage = {
+          id: Date.now(),
+          text: inputText,
+          isUser: true,
+          timestamp: new Date().toLocaleTimeString()
+        };
+        setMessages(prev => [...prev, userMessage]);
+        const currentInput = inputText;
+        setInputText('');
+
+        // Start loading
+        setIsLoading(true);
+        addTypingIndicator();
+
+        try {
+          console.log('📡 Calling backend API...');
+          const response = await fetch('http://127.0.0.1:5000/api/analyze-symptoms', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+              symptoms: currentInput,
+              mode: mode.toLowerCase()
+            })
+          });
+          console.log(`📡 Response status: ${response.status}`);
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+          const data = await response.json();
+          console.log('✅ Backend response:', data);
+          removeTypingIndicator();
+          if (data.success) {
+            addBotMessage(data.response);
+            setConnectionStatus('connected');
+          } else {
+            addBotMessage(`Error: ${data.error || 'Unknown error'}`, true);
+          }
+        } catch (error) {
+          console.error('❌ API call failed:', error);
+          removeTypingIndicator();
+          let errorMessage = 'Could not connect to backend. ';
+          if (error.message.includes('Failed to fetch')) {
+            errorMessage += 'Make sure Flask server is running on port 5000.';
+          } else {
+            errorMessage += error.message;
+          }
+          addBotMessage(errorMessage, true);
+          setConnectionStatus('disconnected');
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      const handleNewChat = () => {
+        setMessages([
+          {
+            id: 1,
+            text: `Hello again! I'm ALTURA, your ${mode === 'Doctor' ? 'medical awareness companion' : 'friendly health buddy'}! 🌟\nWhat can I help you with today?`,
+            isUser: false,
+            timestamp: new Date().toLocaleTimeString()
+          }
+        ]);
+        // Close sidebar after action on mobile
+        if (window.innerWidth < 768) {
+           setShowSidebar(false);
+        }
+      };
+      const clearChat = () => {
+        if (window.confirm('Are you sure you want to clear this conversation?')) {
+          handleNewChat(); // Reuse new chat logic to reset
+        }
+        // Close sidebar after action on mobile
+        if (window.innerWidth < 768) {
+           setShowSidebar(false);
+        }
+      };
+
+      // Function to close sidebar on mobile after an action
+      const closeSidebarOnMobile = () => {
+         if (window.innerWidth < 768) {
+            setShowSidebar(false);
+         }
+      };
+
+      return (
+        <div className="flex h-screen bg-neutral-900 overflow-hidden">
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setShowSidebar(!showSidebar)}
+            className="md:hidden fixed top-4 left-4 z-50 bg-slate-800 p-2 rounded-lg text-white"
+          >
+            <i className={`fas ${showSidebar ? 'fa-times' : 'fa-bars'}`}></i> {/* Icon changes based on state */}
+          </button>
+
+          {/* Sidebar */}
+          <div className={`sidebar-transition fixed md:relative z-40 md:z-0 h-full w-64 sidebar-bg backdrop-blur-sm border-r border-gray-700 transform ${showSidebar ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-300`}>
+            <div className="p-4 border-b border-gray-700">
+              <h2 className="text-white font-bold text-xl flex items-center gap-2">
+                <i className="fas fa-robot"></i>
+                ALTURA
+              </h2>
+              <p className="text-slate-400 text-sm mt-1">Medical Companion</p>
+            </div>
+            <div className="p-4 space-y-2">
+              <button
+                onClick={() => { handleNewChat(); closeSidebarOnMobile(); }}
+                className="w-full p-3 text-left text-white hover:bg-slate-700 rounded-lg transition-colors flex items-center gap-3"
+              >
+                <i className="fas fa-plus"></i>
+                New Chat
+              </button>
+              <button
+                onClick={() => { clearChat(); closeSidebarOnMobile(); }}
+                className="w-full p-3 text-left text-white hover:bg-slate-700 rounded-lg transition-colors flex items-center gap-3"
+              >
+                <i className="fas fa-trash"></i>
+                Clear Chat
+              </button>
+              <button
+                onClick={() => { onHomeClick(); closeSidebarOnMobile(); }}
+                className="w-full p-3 text-left text-white hover:bg-slate-700 rounded-lg transition-colors flex items-center gap-3"
+              >
+                <i className="fas fa-home"></i>
+                Home
+              </button>
+            </div>
+            {/* Connection Status */}
+            <div className="p-4 border-t border-gray-700 mt-auto">
+              <div className="text-xs text-gray-400 mb-2 flex items-center gap-2">
+                <i className="fas fa-plug"></i>
+                Connection Status
+              </div>
+              <div className={`connection-status text-xs px-3 py-2 rounded-lg flex items-center gap-2 ${
+                connectionStatus === 'connected' ? 'bg-green-900/50 text-green-300' :
+                connectionStatus === 'disconnected' ? 'bg-red-900/50 text-red-300' :
+                'bg-yellow-900/50 text-yellow-300'
+              }`}>
+                {connectionStatus === 'connected' ? (
+                  <>
+                    <i className="fas fa-check-circle"></i>
+                    Connected
+                  </>
+                ) : connectionStatus === 'disconnected' ? (
+                  <>
+                    <i className="fas fa-times-circle"></i>
+                    Disconnected
+                  </>
+                ) : (
+                  <>
+                    <i className="fas fa-question-circle"></i>
+                    Unknown
+                  </>
+                )}
+              </div>
+              {connectionStatus === 'disconnected' && (
+                <button
+                  onClick={testBackendConnection}
+                  className="text-xs text-blue-400 hover:underline mt-2 flex items-center gap-1"
+                >
+                  <i className="fas fa-sync"></i>
+                  Retry
+                </button>
+              )}
+            </div>
+            {/* Mode Info */}
+            <div className="p-4 border-t border-gray-700">
+              <div className="text-xs text-gray-400 mb-2">Current Mode</div>
+              <div className={`text-sm px-3 py-2 rounded-lg flex items-center gap-2 ${
+                mode === 'Doctor' ? 'bg-blue-900/50 text-blue-300' : 'bg-green-900/50 text-green-300'
+              }`}>
+                {mode === 'Doctor' ? '👨‍⚕️ Doctor Mode' : '😊 Friend Mode'}
+              </div>
+            </div>
+          </div>
+
+          {/* Overlay for mobile */}
+          {showSidebar && (
+            <div
+              className="md:hidden fixed inset-0 bg-black/50 z-30"
+              onClick={() => setShowSidebar(false)}
+            ></div>
+          )}
+
+          {/* Main Chat Area */}
+          <div className="flex-1 flex flex-col overflow-hidden">
+            {/* Navbar - Simplified for chat view */}
+            <div className="navbar">
+              <div className="altura-logo-container">
+                {/* Use the new class for the img */}
+                <img src="altura-logo.png" alt="ALTURA Logo" className="altura-logo-img" />
+                <button onClick={onHomeClick} className="text-white font-bold text-xl hover:text-blue-400 transition-colors">
+                  ALTURA
+                </button>
+              </div>
+              <div className="hidden md:block">
+                <ModeToggle mode={mode} setMode={setMode} />
+              </div>
+               <div className="flex items-center gap-4">
+                <div className="hidden md:block text-xs text-slate-400">
+                  {isLoading ? (
+                    <span className="flex items-center gap-2">
+                      <i className="fas fa-spinner fa-spin"></i>
+                      Analyzing...
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-2">
+                      <i className="fas fa-check-circle text-green-500"></i>
+                      Ready
+                    </span>
+                  )}
+                </div>
+                {/* Mobile settings button (optional, or just use the main menu) */}
+                <button
+                  onClick={() => setShowSidebar(!showSidebar)}
+                  className="md:hidden text-white hover:text-blue-400"
+                >
+                  <i className="fas fa-cog"></i>
+                </button>
+              </div>
+            </div>
+
+            {/* Chat Messages */}
+            <div className="message-container">
+              {messages.map((message) => (
+                <div
+                  key={message.id}
+                  className={`message ${message.isUser ? 'message-user' : 'message-bot'} fade-in`}
+                >
+                  <div className="message-text">
+                    {message.isTyping ? (
+                      <div className="flex items-center gap-3">
+                        <div className="flex gap-1">
+                          <div className="typing-indicator"></div>
+                          <div className="typing-indicator"></div>
+                          <div className="typing-indicator"></div>
+                        </div>
+                        <span className="text-sm text-gray-300">ALTURA is thinking...</span>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="text-sm whitespace-pre-line leading-relaxed">
+                          {message.text}
+                        </div>
+                        <div className="text-xs text-gray-400 mt-2 flex justify-between items-center">
+                          <span>{message.timestamp}</span>
+                          {!message.isUser && !message.isError && (
+                            <span className="text-xs bg-slate-600/50 px-2 py-1 rounded">
+                              {mode} Mode
+                            </span>
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+              ))}
+              <div ref={messagesEndRef} />
+            </div>
+
+            {/* Disclaimer */}
+            <div className="bg-yellow-900/30 border-t border-yellow-700/50 p-3 text-center backdrop-blur-sm">
+              <p className="text-yellow-200 text-xs flex items-center justify-center gap-2">
+                <i className="fas fa-exclamation-triangle"></i>
+                Educational purposes only. Not a replacement for professional medical advice.
+              </p>
+            </div>
+
+            {/* Chat Input */}
+            <div className="input-area">
+              <div className="w-full">
+                 <div className="flex justify-center mb-3 md:hidden"> {/* Show mode toggle on mobile too, centered */}
+                   <ModeToggle mode={mode} setMode={setMode} />
+                 </div>
+                 <div className="flex gap-3">
+                   <div className="flex-1 relative">
+                     <input
+                       type="text"
+                       value={inputText}
+                       onChange={(e) => setInputText(e.target.value)}
+                       onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
+                       placeholder={`Message ALTURA in ${mode} mode...`}
+                       className="input-field w-full" /* Ensure full width */
+                       disabled={isLoading}
+                     />
+                     <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400">
+                       <i className="fas fa-paper-plane"></i>
+                     </div>
+                   </div>
+                   <button
+                     onClick={handleSend}
+                     disabled={isLoading || !inputText.trim()}
+                     className="send-button flex items-center gap-2" /* Add gap for icon/text */
+                   >
+                     {isLoading ? (
+                       <>
+                         <i className="fas fa-spinner fa-spin"></i>
+                         <span className="hidden md:inline">Sending...</span> {/* Hide text on small mobile buttons if needed */}
+                       </>
+                     ) : (
+                       <>
+                         <i className="fas fa-paper-plane"></i>
+                         <span className="hidden md:inline">Send</span> {/* Hide text on small mobile buttons if needed */}
+                       </>
+                     )}
+                   </button>
+                 </div>
+                 <div className="text-xs text-slate-500 mt-2 text-center">
+                   Press Enter to send, Shift+Enter for new line
+                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    function ModeToggle({ mode, setMode }) {
+      const toggleMode = () => {
+        setMode(prevMode => prevMode === 'Doctor' ? 'Friend' : 'Doctor');
+      };
+      return (
+        <button
+          onClick={toggleMode}
+          className={`mode-button ${mode === 'Doctor' ? 'doctor-mode' : 'friend-mode'} flex items-center gap-2`} /* Add flex and gap */
+        >
+          <span className="text-lg">{mode === 'Doctor' ? '👨‍⚕️' : '😊'}</span>
+          <span className="hidden md:inline">{mode} Mode</span> {/* Hide full text on very small screens if inside button */}
+          <i className="fas fa-exchange-alt text-xs"></i>
+        </button>
+      );
+    }
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
