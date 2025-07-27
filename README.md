@@ -1,5 +1,5 @@
 # Altura-Med-AI
-ALTURA: An AI-powered medical awareness chatbot (AI Spark project for Innovista).
+ALTURA: An AI-powered medical awareness chatbot (AI Spark project for Innovista). Badass Ai That Will Chnage The Medical Field 
 # ALTURA - Medical AI Companion
 
 An AI-powered chatbot designed to provide medical *awareness* based on user-input symptoms. This project was developed for the AI Spark program at [Your College Name - maybe Innovista?].
